@@ -39,7 +39,7 @@ namespace MagicVilla_VillaAPI.Controllers
             try
             {
                 _logger.LogInformation("Getting all villa numbers");
-                IEnumerable<VillaNumber> villaList = await _dbVillaNumber.GetAllAsync();
+                IEnumerable<VillaNumber> villaList = await _dbVillaNumber.GetAllAsync(includeProperties: "Villa");
 
                 _response.Result = _mapper.Map<List<VillaNumberDTO>>(villaList);
                 _response.StatusCode = HttpStatusCode.OK;
@@ -70,7 +70,7 @@ namespace MagicVilla_VillaAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var villa = await _dbVillaNumber.GetAsync(x => x.VillaNo == id);
+                var villa = await _dbVillaNumber.GetAsync(x => x.VillaNo == id, includeProperties: "Villa");
                 if (villa == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
@@ -103,13 +103,13 @@ namespace MagicVilla_VillaAPI.Controllers
                         x.VillaNo == createDTO.VillaNo
                     ) != null)
                 {
-                    ModelState.AddModelError("CustomError", "Villa already exists!");
+                    ModelState.AddModelError("ErrorMessages", "Villa already exists!");
                     return BadRequest(ModelState);
                 }
 
                 if (await _dbVilla.GetAsync(x => x.Id == createDTO.VillaNo) == null)
                 {
-                    ModelState.AddModelError("CustomError", "Villa ID is invalid!");
+                    ModelState.AddModelError("ErrorMessages", "Villa ID is invalid!");
                     return BadRequest(ModelState);
                 }
 
@@ -187,7 +187,7 @@ namespace MagicVilla_VillaAPI.Controllers
 
                 if (await _dbVilla.GetAsync(x => x.Id == updateDTO.VillaNo) == null)
                 {
-                    ModelState.AddModelError("CustomError", "Villa ID is invalid!");
+                    ModelState.AddModelError("ErrorMessages", "Villa ID is invalid!");
                     return BadRequest(ModelState);
                 }
 
